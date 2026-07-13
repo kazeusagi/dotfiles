@@ -47,9 +47,15 @@
 
   programs.fish = {
     enable = true;
+    # 常に実行
     shellInit = ''
+      # Nixのパスを追加
       fish_add_path /nix/var/nix/profiles/default/bin
-      fish_add_path ~/.nix-profile/bin
+    '';
+    # 対話シェル時のみ実行
+    interactiveShellInit = ''
+      # チュートリアルを非表示
+      set -g fish_greeting
     '';
     shellAliases = {
       ls = "eza --icons";
@@ -57,6 +63,7 @@
       la = "eza -la --icons";
       lt = "eza --tree --icons";
       cat = "bat";
+      cd = "z";
       find = "fd";
       grep = "rg";
       du = "dust";
@@ -73,7 +80,14 @@
 
   programs.fzf = {
     enable = true;
-    enableFishIntegration = true;
+  };
+
+  # Warnが出るため明示的に無効化
+  programs.man.enable = false;
+
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
   };
 
   programs.zed-editor = {
