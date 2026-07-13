@@ -19,8 +19,7 @@
 
   outputs = { nixpkgs, home-manager, nix-claude-code, nix-bun, ... }:
     let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
+      mkPkgs = system: import nixpkgs {
         inherit system;
         config.allowUnfreePredicate =
           pkg: builtins.elem (nixpkgs.lib.getName pkg) [ "claude" ];
@@ -32,8 +31,12 @@
     in
     {
       homeConfigurations."kazeusagi" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+        pkgs = mkPkgs "x86_64-linux";
         modules = [ ./home.nix ];
+      };
+      homeConfigurations."ito.toshiki" = home-manager.lib.homeManagerConfiguration {
+        pkgs = mkPkgs "aarch64-darwin";
+        modules = [ ./home-mac.nix ];
       };
     };
 }
