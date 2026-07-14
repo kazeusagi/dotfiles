@@ -1,8 +1,12 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, username, platform, ... }:
 
 {
-  imports = [ ./common.nix ];
+  imports = [ ./common.nix ]
+    ++ lib.optional (platform == "mac") ./mac.nix
+    ++ lib.optional (platform == "win") ./win.nix
+    ++ lib.optional (platform == "linux") ./linux.nix;
 
-  home.username = "kazeusagi";
-  home.homeDirectory = "/home/kazeusagi";
+  home.username = username;
+  home.homeDirectory =
+    if platform == "mac" then "/Users/${username}" else "/home/${username}";
 }

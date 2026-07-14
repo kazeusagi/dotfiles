@@ -28,15 +28,18 @@
           nix-bun.overlays.default
         ];
       };
+      users = {
+        "kazeusagi"    = { system = "x86_64-linux";   platform = "win"; module = ./home.nix; };
+        "ito.toshiki"  = { system = "aarch64-darwin"; platform = "mac"; module = ./home-mac.nix; };
+      };
     in
     {
-      homeConfigurations."kazeusagi" = home-manager.lib.homeManagerConfiguration {
-        pkgs = mkPkgs "x86_64-linux";
-        modules = [ ./home.nix ];
-      };
-      homeConfigurations."ito.toshiki" = home-manager.lib.homeManagerConfiguration {
-        pkgs = mkPkgs "aarch64-darwin";
-        modules = [ ./home-mac.nix ];
-      };
+      homeConfigurations = builtins.mapAttrs (username: cfg:
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = mkPkgs cfg.system;
+          extraSpecialArgs = { inherit username; inherit (cfg) platform; };
+          modules = [ cfg.module ];
+        }
+      ) users;
     };
 }

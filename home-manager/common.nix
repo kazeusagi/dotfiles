@@ -5,6 +5,7 @@
 
   home.packages = with pkgs; [
     nixd # Nix LSP
+    openssh
 
     # Overlays
     claude-code
@@ -46,13 +47,6 @@
       name = "kazeusagi";
     };
   };
-
-  # programs.bash = {
-  #   enable = true;
-  #   shellAliases = {
-  #     ll = "ls -la";
-  #   };
-  # }
 
   programs.fish = {
     enable = true;
@@ -110,17 +104,10 @@
     };
   };
 
-  # programs.ssh = {
-  #   enable = true;
-  #   includes = lib.optionals pkgs.stdenv.isDarwin [
-  #     "~/.orbstack/ssh/config"
-  #   ];
-  #   matchBlocks."*" = {
-  #     extraOptions = {
-  #       IdentityAgent = "~/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock";
-  #     };
-  #   };
-  # };
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+  };
 
   programs.home-manager.enable = true;
 }
