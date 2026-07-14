@@ -6,11 +6,10 @@
 # Nixのインストール
 sudo apt update
 sudo apt install -y curl xz-utils
-sudo apt install -y curl xz-utils
 curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh -s -- --daemon
 # Git環境の起動
 nix shell nixpkgs#git --extra-experimental-features "nix-command flakes"
-# クローン
+# HTTPSでクローン
 mkdir -p ~/git
 cd ~/git
 git clone https://github.com/kazeusagi/dotfiles.git
@@ -54,4 +53,6 @@ Get-Command npiperelay
 
 ssh-add -l
 ssh -T git@github.com
+# GitへのアクセスをSSH経由にする
+git remote set-url origin git@github.com:kazeusagi/dotfiles.git
 ```
