@@ -1,10 +1,12 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   home.stateVersion = "26.05";
 
   home.packages = with pkgs; [
     nixd # Nix LSP
+
+    # Overlays
     claude-code
     bun
 
@@ -28,6 +30,13 @@
     tldr       # man の簡易版
     htop
     tmux
+
+    awscli2
+    opentofu # terraformは非フリーライセンス(BSL)でビルドが発生するためtofuを使用
+    # fish以外のシェルでもterraformをtofuとして実行可能にするためのラッパー
+    (pkgs.writeShellScriptBin "terraform" ''
+      exec ${pkgs.opentofu}/bin/tofu "$@"
+    '')
   ];
 
   programs.git = {
@@ -63,13 +72,14 @@
       la = "eza -la --icons";
       lt = "eza --tree --icons";
       cat = "bat";
-      cd = "z";
+      cd = "zoxide";
       find = "fd";
       grep = "rg";
       du = "dust";
       df = "duf";
       ps = "procs";
       top = "btm";
+      cc = "claude --dangerously-skip-permissions";
     };
   };
 
@@ -99,6 +109,18 @@
       tab_size = 2;
     };
   };
+
+  # programs.ssh = {
+  #   enable = true;
+  #   includes = lib.optionals pkgs.stdenv.isDarwin [
+  #     "~/.orbstack/ssh/config"
+  #   ];
+  #   matchBlocks."*" = {
+  #     extraOptions = {
+  #       IdentityAgent = "~/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock";
+  #     };
+  #   };
+  # };
 
   programs.home-manager.enable = true;
 }
