@@ -29,8 +29,8 @@
         ];
       };
       users = {
-        "kazeusagi"    = { system = "x86_64-linux";   platform = "win"; module = ./home.nix; };
-        "ito.toshiki"  = { system = "aarch64-darwin"; platform = "mac"; module = ./home-mac.nix; };
+        "kazeusagi"   = { system = "x86_64-linux";   platform = "win"; };
+        "ito.toshiki" = { system = "aarch64-darwin"; platform = "mac"; };
       };
     in
     {
@@ -38,7 +38,7 @@
         home-manager.lib.homeManagerConfiguration {
           pkgs = mkPkgs cfg.system;
           extraSpecialArgs = { inherit username; inherit (cfg) platform; };
-          modules = [ cfg.module ];
+          modules = [ ./home.nix ];
         }
       ) users;
     };
