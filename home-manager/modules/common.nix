@@ -1,11 +1,15 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, username, homeDirectory, pkgs, ... }:
 
 {
   home.stateVersion = "26.05";
+  home.username = username;
+  home.homeDirectory = homeDirectory;
 
   home.packages = with pkgs; [
     nixd # Nix LSP
     openssh
+    fontconfig
+    nerd-fonts.symbols-only
 
     # Overlays
     claude-code
@@ -40,6 +44,8 @@
     '')
   ];
 
+  fonts.fontconfig.enable = true;
+
   programs.git = {
     enable = true;
     settings.user = {
@@ -54,6 +60,8 @@
     shellInit = ''
       # Nixのパスを追加
       fish_add_path /nix/var/nix/profiles/default/bin
+      # Home Manager binのパス追加
+      fish_add_path $HOME/.nix-profile/bin
     '';
     # 対話シェル時のみ実行
     interactiveShellInit = ''
@@ -66,7 +74,7 @@
       la = "eza -la --icons";
       lt = "eza --tree --icons";
       cat = "bat";
-      cd = "zoxide";
+      cd = "z";
       find = "fd";
       grep = "rg";
       du = "dust";
@@ -84,6 +92,7 @@
 
   programs.fzf = {
     enable = true;
+    enableFishIntegration = true;
   };
 
   # Warnが出るため明示的に無効化
@@ -101,6 +110,10 @@
 
     userSettings = {
       tab_size = 2;
+
+      terminal = {
+        font_fallbacks = [ "Symbols Nerd Font Mono" ];
+      };
     };
   };
 

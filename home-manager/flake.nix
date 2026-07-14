@@ -19,6 +19,7 @@
 
   outputs = { nixpkgs, home-manager, nix-claude-code, nix-bun, ... }:
     let
+      lib = nixpkgs.lib;
       mkPkgs = system: import nixpkgs {
         inherit system;
         config.allowUnfreePredicate =
@@ -29,16 +30,22 @@
         ];
       };
       users = {
-        "kazeusagi"   = { system = "x86_64-linux";   platform = "win"; };
-        "ito.toshiki" = { system = "aarch64-darwin"; platform = "mac"; };
+        "kazeusagi"   = { system = "x86_64-linux";   platform = "win"; homeDirectory = "/home/kazeusagi"; };
+        "ito.toshiki" = { system = "aarch64-darwin"; platform = "mac"; homeDirectory = "/Users/ito.toshiki"; };
       };
     in
     {
       homeConfigurations = builtins.mapAttrs (username: cfg:
         home-manager.lib.homeManagerConfiguration {
           pkgs = mkPkgs cfg.system;
-          extraSpecialArgs = { inherit username; inherit (cfg) platform; };
-          modules = [ ./home.nix ];
+          extraSpecialArgs = {
+            inherit username;
+            inherit (cfg) platform homeDirectory;
+          };
+          modules = [ ./modules/common.nix ]
+            ++ lib.optional (cfg.platform == "mac") ./modules/platform/mac.nix
+            ++ lib.optional (cfg.platform == "win") ./modules/platform/win.nix
+            ++ lib.optional (cfg.platform == "linux") ./modules/platform/linux.nix;
         }
       ) users;
     };
