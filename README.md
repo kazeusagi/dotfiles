@@ -36,10 +36,9 @@ nix run home-manager/release-26.05 -- switch --flake ~/.config/home-manager
 home-manager switch
 ```
 
-# Fish
+# デフォルトシェルをfishにする
 
 ```sh
-# Mac
 echo $(which fish) | sudo tee -a /etc/shells
 chsh -s $(which fish)
 ```
