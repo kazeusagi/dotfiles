@@ -117,6 +117,50 @@
     };
   };
 
+  programs.neovim = {
+    enable = true;
+    plugins = with pkgs.vimPlugins; [
+      catppuccin-nvim # Theme
+      lualine-nvim # Status Line
+      neo-tree-nvim # File Tree
+      telescope-fzf-native-nvim # 検索
+      gitsigns-nvim
+      which-key-nvim
+
+      # Dependencies
+      nvim-web-devicons # UI プラグイン全般が依存するアイコン集
+      nui-nvim # UI　コンポーネント
+      plenary-nvim # 非同期処理を持つプラグイン全般
+    ];
+    initLua = ''
+      vim.g.mapleader = " "
+      vim.opt.timeoutlen = 200 -- <leader>押下時のdelay
+
+      require('which-key').setup({})
+
+      vim.cmd.colorscheme("catppuccin")
+      require('lualine').setup()
+      require('neo-tree').setup({})
+
+      -- 初回起動時にNeotreeを表示する
+      vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function()
+          vim.cmd("Neotree show")
+        end,
+      })
+
+      -- keymap
+      vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "左のウィンドウへ" })
+      vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "右のウィンドウへ" })
+      vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "下のウィンドウへ" })
+      vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "上のウィンドウへ" })
+      local builtin = require('telescope.builtin')
+      vim.keymap.set('n', '<leader>ff', builtin.find_files)
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep)
+      vim.keymap.set('n', '<leader>fb', builtin.buffers)
+    '';
+  };
+
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
