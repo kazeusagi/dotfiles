@@ -1,4 +1,11 @@
-{ config, lib, username, homeDirectory, pkgs, ... }:
+{
+  config,
+  lib,
+  username,
+  homeDirectory,
+  pkgs,
+  ...
+}:
 
 {
   home.stateVersion = "26.05";
@@ -6,7 +13,6 @@
   home.homeDirectory = homeDirectory;
 
   home.packages = with pkgs; [
-    nixd # Nix LSP
     openssh
     fontconfig
     nerd-fonts.symbols-only
@@ -15,24 +21,26 @@
     claude-code
     bun
 
-    eza        # ls の代替
-    bat        # cat の代替(シンタックスハイライト)
-    fd         # find の代替
-    ripgrep    # grep の代替(rg)
-    dust       # du の代替
-    duf        # df の代替
-    procs      # ps の代替
-    bottom     # top の代替(btm)
+    nodejs_26
 
-    jq         # JSON処理
+    eza # ls の代替
+    bat # cat の代替(シンタックスハイライト)
+    fd # find の代替
+    ripgrep # grep の代替(rg)
+    dust # du の代替
+    duf # df の代替
+    procs # ps の代替
+    bottom # top の代替(btm)
+
+    jq # JSON処理
     git
     curl
     wget
     tree
     unzip
 
-    delta      # git diff を見やすく
-    tldr       # man の簡易版
+    delta # git diff を見やすく
+    tldr # man の簡易版
     htop
     tmux
 
@@ -119,6 +127,14 @@
 
   programs.neovim = {
     enable = true;
+
+    extraPackages = with pkgs; [
+      nixd
+      nixfmt
+      statix
+      deadnix
+    ];
+
     plugins = with pkgs.vimPlugins; [
       catppuccin-nvim # Theme
       lualine-nvim # Status Line
@@ -126,6 +142,11 @@
       telescope-fzf-native-nvim # 検索
       gitsigns-nvim
       which-key-nvim
+      bufferline-nvim
+
+      nvim-lspconfig
+      conform-nvim
+      nvim-lint
 
       # Dependencies
       nvim-web-devicons # UI プラグイン全般が依存するアイコン集
@@ -135,17 +156,53 @@
     initLua = ''
       vim.g.mapleader = " "
       vim.opt.timeoutlen = 200 -- <leader>押下時のdelay
+      vim.opt.number = true
+      vim.opt.relativenumber = true
+      vim.opt.hlsearch = true
+      vim.opt.incsearch = true
 
+      vim.opt.expandtab = true
+      vim.opt.shiftwidth = 2
+      vim.opt.softtabstop = 2
+      vim.opt.tabstop = 2
+
+      vim.opt.list = true
+      vim.opt.listchars = { tab = "→ ", trail = "·", space = "·" }
+
+      vim.lsp.config('nixd', {})
+      vim.lsp.enable('nixd')
       require('which-key').setup({})
-
+      require('catppuccin').setup({
+      })
       vim.cmd.colorscheme("catppuccin")
+      require('bufferline').setup()
       require('lualine').setup()
-      require('neo-tree').setup({})
+      require('neo-tree').setup({
+        window = {
+          mappings = {
+            ["<space>"] = "none",
+            ["l"] = "open",
+            ["h"] = "close_node",
+       	  }
+       	}
+      })
+
+      -- フォーマット(保存時に自動実行)
+      require('conform').setup({
+        formatters_by_ft = { nix = { "nixfmt" } },
+        format_on_save = { lsp_fallback = true },
+      })
+
+      -- リント(保存時に自動実行)
+      require('lint').linters_by_ft = { nix = { "statix" } }
+      vim.api.nvim_create_autocmd("BufWritePost", {
+        callback = function() require("lint").try_lint() end,
+      })
 
       -- 初回起動時にNeotreeを表示する
       vim.api.nvim_create_autocmd("VimEnter", {
         callback = function()
-          vim.cmd("Neotree show")
+          vim.cmd("Neotree focus")
         end,
       })
 
@@ -159,6 +216,10 @@
       vim.keymap.set('n', '<leader>fg', builtin.live_grep)
       vim.keymap.set('n', '<leader>fb', builtin.buffers)
     '';
+  };
+
+  programs.starship = {
+    enable = true;
   };
 
   programs.ssh = {
