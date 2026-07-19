@@ -9,6 +9,7 @@
       nixfmt
       statix
       deadnix
+      lazygit
     ];
 
     plugins = with pkgs.vimPlugins; [
@@ -31,6 +32,7 @@
       nui-nvim # UI　コンポーネント
       plenary-nvim # 非同期処理を持つプラグイン全般
     ];
+
     initLua = ''
       vim.g.mapleader = " "
       vim.opt.timeoutlen = 200 -- <leader>押下時のdelay
@@ -48,10 +50,14 @@
       vim.opt.listchars = { tab = "→ ", trail = "·", space = "·" }
 
       -- LSP
-      vim.lsp.config('nixd', {})
+      local capabilities = require("blink-cmp").get_lsp_capabilities()
+      vim.lsp.config('nixd', { capabilities = capabilities })
       vim.lsp.enable('nixd')
-      require("blink.cmp").setup()
+      require("blink.cmp").setup({
+        keymap = {preset = "enter"}
+      })
 
+      -- Theme
       require('which-key').setup({})
       require('catppuccin').setup({
       })
@@ -86,6 +92,10 @@
           vim.cmd("Neotree focus")
         end,
       })
+
+      -- Git
+      vim.opt.signcolumn = "yes"
+      require("gitsigns").setup()
 
       -- keymap
       vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "左のウィンドウへ" })
