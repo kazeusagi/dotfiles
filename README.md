@@ -56,3 +56,10 @@ ssh -T git@github.com
 # GitへのアクセスをSSH経由にする
 git remote set-url origin git@github.com:kazeusagi/dotfiles.git
 ```
+
+```sh
+curl -sLo /tmp/win32yank.zip https://github.com/equalsraf/win32yank/releases/latest/download/win32yank-x64.zip
+unzip -p /tmp/win32yank.zip win32yank.exe > /tmp/win32yank.exe
+sudo mv /tmp/win32yank.exe /usr/local/bin/win32yank.exe
+sudo chmod +x /usr/local/bin/win32yank.exe
+```
