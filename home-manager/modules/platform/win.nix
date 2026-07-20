@@ -1,10 +1,16 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   home.packages = with pkgs; [
     socat
   ];
 
+  # SSH Agent
   systemd.user.services.bitwarden-ssh-agent = {
     Unit = {
       Description = "Bridge Bitwarden Windows SSH Agent to WSL";
@@ -20,7 +26,6 @@
     };
     Install.WantedBy = [ "default.target" ];
   };
-
   home.sessionVariables = {
     SSH_AUTH_SOCK = "${config.home.homeDirectory}/.bitwarden-ssh-agent.sock";
   };

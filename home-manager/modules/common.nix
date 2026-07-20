@@ -17,6 +17,6 @@
     ./common/nvim.nix
     ./common/zed.nix
     ./common/tmux.nix
+    ./common/cloudflare.nix
   ];
-
 }
