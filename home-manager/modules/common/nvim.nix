@@ -10,6 +10,7 @@
       statix
       deadnix
       lazygit
+      tree-sitter
     ];
 
     plugins = with pkgs.vimPlugins; [
@@ -17,15 +18,26 @@
       lualine-nvim # Status Line
       neo-tree-nvim # File Tree
       telescope-fzf-native-nvim # 検索
-      gitsigns-nvim
-      which-key-nvim
-      bufferline-nvim
-      lazygit-nvim
-      blink-cmp
+      gitsigns-nvim # 差分の視覚化
+      which-key-nvim # コマンドのキー入力候補の表示
+      bufferline-nvim # バッファ一覧をタブに表示
+      lazygit-nvim # Git操作
+      blink-cmp # 補完
+      (nvim-treesitter.withPlugins (
+        p: with p; [
+          nix
+          lua
+          typescript
+          tsx
+          terraform
+        ]
+      )) # 構文解析およびシンタックスハイライト
 
-      nvim-lspconfig
-      conform-nvim
-      nvim-lint
+      nvim-lspconfig # LSP
+      conform-nvim # 基本のフォーマッタ
+      nvim-lint # 基本のリンタ
+
+      vim-tmux-navigator # tmuxとの統合
 
       # Dependencies
       nvim-web-devicons # UI プラグイン全般が依存するアイコン集
@@ -49,13 +61,27 @@
       vim.opt.list = true
       vim.opt.listchars = { tab = "→ ", trail = "·", space = "·" }
 
+      vim.diagnostic.config({ virtual_text = true })
+
       -- LSP
       local capabilities = require("blink-cmp").get_lsp_capabilities()
       vim.lsp.config('nixd', { capabilities = capabilities })
       vim.lsp.enable('nixd')
       require("blink.cmp").setup({
-        keymap = {preset = "enter"}
+        keymap = {
+          preset = "enter",
+          ["<Esc>"] = { "hide", "fallback" },
+        }
       })
+      vim.api.nvim_create_autocmd('FileType', {
+        callback = function()
+          pcall(vim.treesitter.start)
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+      vim.opt.foldmethod = "expr"
+      vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+      vim.opt.foldenable = false
 
       -- Theme
       require('which-key').setup({})
@@ -98,10 +124,6 @@
       require("gitsigns").setup()
 
       -- keymap
-      vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "左のウィンドウへ" })
-      vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "右のウィンドウへ" })
-      vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "下のウィンドウへ" })
-      vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "上のウィンドウへ" })
       local builtin = require('telescope.builtin')
       vim.keymap.set('n', '<leader>ff', builtin.find_files)
       vim.keymap.set('n', '<leader>fg', builtin.live_grep)
@@ -111,6 +133,9 @@
       -- バッファ切り替え
       vim.keymap.set("n", "<S-l>", ":bnext<CR>", { desc = "次のバッファ" })
       vim.keymap.set("n", "<S-h>", ":bprev<CR>", { desc = "前のバッファ" })
+      -- tmux統合
+      vim.keymap.set('n', '<C-a>', '<Nop>')
+      vim.keymap.set('v', '<C-a>', '<Nop>')
     '';
   };
 }

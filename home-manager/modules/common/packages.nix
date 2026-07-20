@@ -39,21 +39,42 @@
     '')
   ];
 
-  programs.git = {
-    enable = true;
-    settings.user = {
-      email = "toshiki1098@gmail.com";
-      name = "kazeusagi";
+  programs = {
+    home-manager.enable = true;
+
+    git = {
+      enable = true;
+      settings.user = {
+        email = "toshiki1098@gmail.com";
+        name = "kazeusagi";
+      };
     };
-  };
 
-  programs.zoxide = {
-    enable = true;
-    enableFishIntegration = true;
-  };
+    zoxide = {
+      enable = true;
+      enableFishIntegration = true;
+    };
 
-  programs.fzf = {
-    enable = true;
-    enableFishIntegration = true;
+    fzf = {
+      enable = true;
+      enableFishIntegration = true;
+    };
+
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+
+    starship = {
+      enable = true;
+    };
+
+    ssh = {
+      enable = true;
+      enableDefaultConfig = false;
+    };
+
+    # Warnが出るため明示的に無効化
+    man.enable = false;
   };
 }
