@@ -32,6 +32,7 @@
           terraform
         ]
       )) # 構文解析およびシンタックスハイライト
+      comment-nvim
 
       nvim-lspconfig # LSP
       conform-nvim # 基本のフォーマッタ
@@ -136,6 +137,7 @@
       -- tmux統合
       vim.keymap.set('n', '<C-a>', '<Nop>')
       vim.keymap.set('v', '<C-a>', '<Nop>')
+      require('Comment').setup()
     '';
   };
 }

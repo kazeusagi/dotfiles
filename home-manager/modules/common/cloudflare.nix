@@ -15,10 +15,8 @@
   home.file.".cloudflared/config.yml".text = ''
     tunnel: ${tunnelId}
     credentials-file: ${config.home.homeDirectory}/.cloudflared/${tunnelId}.json
-    ingress:
-      - hostname: ${tunnelName}.kazeusagi.dev
-        service: ssh://localhost:22
-      - service: http_status:404
+    warp-routing:
+      enabled: true
   '';
 
   systemd.user.services.cloudflared = {
